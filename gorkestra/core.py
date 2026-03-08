@@ -1,27 +1,39 @@
-"""Core conductor class - the heart of gorkestra."""
+"""Core conductor class - orchestrate Grok with personality."""
 
-from typing import Optional, Dict, Any, Union
+from typing import Optional, Dict, Any
 from .backends.base import Backend
-from .backends.openai import OpenAIBackend
+from .backends.grok import GrokBackend
 from .personas.base import Persona
 from .personas.builtin import get_persona, PERSONAS
 
 class Conductor:
     """
-    The main orchestrator for AI responses with personality.
+    Orchestrate Grok with configurable personalities.
     
     Example:
         conductor = Conductor()
-        response = conductor.conduct("Hello!", persona="roast", iq=35)
+        response = conductor.conduct("Hello!", persona="savage", iq=35)
     """
     
     def __init__(
         self,
         backend: Optional[Backend] = None,
+        model: str = "grok-2",
+        api_key: Optional[str] = None,
         default_persona: str = "default",
         default_iq: int = 100
     ):
-        self.backend = backend or OpenAIBackend()
+        """
+        Initialize the Conductor.
+        
+        Args:
+            backend: Custom backend (default: GrokBackend)
+            model: Grok model to use (grok-2, grok-2-mini, grok-beta)
+            api_key: xAI API key (or set XAI_API_KEY env var)
+            default_persona: Default persona name
+            default_iq: Default IQ level (35-200)
+        """
+        self.backend = backend or GrokBackend(model=model, api_key=api_key)
         self.default_persona = default_persona
         self.default_iq = default_iq
         self._custom_personas: Dict[str, Persona] = {}
@@ -31,7 +43,7 @@ class Conductor:
         self._custom_personas[persona.name] = persona
     
     def get_persona(self, name: str) -> Persona:
-        """Get a persona by name (custom or built-in)."""
+        """Get persona by name."""
         if name in self._custom_personas:
             return self._custom_personas[name]
         return get_persona(name)
@@ -46,18 +58,17 @@ class Conductor:
         **kwargs
     ) -> str:
         """
-        Generate a response with the specified persona and IQ.
+        Generate a response with Grok using the specified persona.
         
         Args:
-            prompt: The user's input
-            persona: Name of persona to use (default: self.default_persona)
-            iq: Intelligence level 35-200 (default: self.default_iq)
-            temperature: Override temperature (default: calculated from persona)
-            max_tokens: Maximum tokens in response
-            **kwargs: Additional backend-specific arguments
+            prompt: User input
+            persona: Persona name (default/savage/ceo/cope/oracle/chaos)
+            iq: Intelligence level 35-200
+            temperature: Override temperature
+            max_tokens: Max response tokens
         
         Returns:
-            The AI's response as a string
+            Grok's response
         """
         persona_name = persona or self.default_persona
         iq_level = iq or self.default_iq
@@ -65,10 +76,8 @@ class Conductor:
         persona_obj = self.get_persona(persona_name)
         system_prompt = persona_obj.format_prompt(iq_level)
         
-        # Calculate temperature from IQ if not specified
         if temperature is None:
             base_temp = 0.7
-            # Lower IQ = higher temperature (more chaotic)
             iq_temp_modifier = (100 - iq_level) / 200
             temperature = persona_obj.get_temperature(base_temp + iq_temp_modifier)
         
@@ -81,13 +90,7 @@ class Conductor:
         )
     
     def list_personas(self) -> Dict[str, str]:
-        """List all available personas with descriptions."""
-        result = {}
-        for name, p in PERSONAS.items():
-            result[name] = p.description or "No description"
-        for name, p in self._custom_personas.items():
-            result[name] = p.description or "Custom persona"
+        """List all available personas."""
+        result = {name: p.description or "" for name, p in PERSONAS.items()}
+        result.update({name: p.description or "Custom" for name, p in self._custom_personas.items()})
         return result
-    
-    def __repr__(self) -> str:
-        return f"Conductor(backend={self.backend}, persona={self.default_persona})"

@@ -1,4 +1,5 @@
 from .base import Backend
-from .openai import OpenAIBackend
+from .grok import GrokBackend
 
-__all__ = ["Backend", "OpenAIBackend"]
+# Grok is the primary backend
+__all__ = ["Backend", "GrokBackend"]

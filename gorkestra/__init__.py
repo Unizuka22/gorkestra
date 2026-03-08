@@ -1,8 +1,12 @@
-"""gorkestra - Conduct your AI. It will not listen."""
+"""
+gorkestra - Orchestrate Grok with personality.
+
+A Python SDK for xAI's Grok with configurable personas and IQ levels.
+"""
 
 from .core import Conductor
 from .personas.base import Persona
-from .backends.base import Backend
+from .backends.grok import GrokBackend
 
 __version__ = "0.1.0"
-__all__ = ["Conductor", "Persona", "Backend"]
+__all__ = ["Conductor", "Persona", "GrokBackend"]

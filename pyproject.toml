@@ -5,14 +5,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "gorkestra"
 version = "0.1.0"
-description = "Conduct your AI. It will not listen."
+description = "Orchestrate Grok with personality. A Python SDK for xAI's Grok."
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.9"
 authors = [
-    {name = "Unizuka22", email = "unizuka22@users.noreply.github.com"}
+    {name = "Unizuka22"}
 ]
-keywords = ["ai", "llm", "openai", "anthropic", "orchestration", "personas"]
+keywords = ["grok", "xai", "ai", "llm", "orchestration", "sdk"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -28,9 +28,6 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-anthropic = ["anthropic>=0.18.0"]
-ollama = ["ollama>=0.1.0"]
-all = ["anthropic>=0.18.0", "ollama>=0.1.0"]
 dev = ["pytest>=7.0", "pytest-cov", "black", "ruff", "mypy"]
 
 [project.scripts]
@@ -39,20 +36,6 @@ gorkestra = "gorkestra.cli:main"
 [project.urls]
 Homepage = "https://github.com/Unizuka22/gorkestra"
 Repository = "https://github.com/Unizuka22/gorkestra"
-Issues = "https://github.com/Unizuka22/gorkestra/issues"
 
 [tool.setuptools.packages.find]
 include = ["gorkestra*"]
-
-[tool.black]
-line-length = 100
-target-version = ["py39"]
-
-[tool.ruff]
-line-length = 100
-select = ["E", "F", "I", "N", "W"]
-
-[tool.mypy]
-python_version = "3.9"
-warn_return_any = true
-warn_unused_ignores = true
