@@ -1,4 +1,4 @@
 from .base import Persona
-from .builtin import PERSONAS, get_persona
+from .library import PERSONAS, get_persona
 
 __all__ = ["Persona", "PERSONAS", "get_persona"]

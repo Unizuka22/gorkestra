@@ -1,29 +1,26 @@
 """Base persona class."""
 
-from dataclasses import dataclass
-from typing import Optional
+from dataclasses import dataclass, field
+from typing import Optional, List
 
 @dataclass
 class Persona:
-    """Defines a personality for the AI conductor."""
+    """
+    Defines an agent's personality.
     
+    Attributes:
+        name: Unique identifier
+        system_prompt: Core personality instructions
+        voice: Speaking style hints
+        temperature: Creativity level (0.0-2.0)
+        traits: Personality traits
+    """
     name: str
     system_prompt: str
-    temperature_modifier: float = 0.0
-    description: Optional[str] = None
+    voice: Optional[str] = None
+    temperature: float = 0.7
+    traits: List[str] = field(default_factory=list)
     
-    def get_temperature(self, base_temp: float) -> float:
-        """Calculate adjusted temperature."""
-        return max(0.0, min(2.0, base_temp + self.temperature_modifier))
-    
-    def format_prompt(self, iq: int = 100) -> str:
-        """Format the system prompt with IQ adjustment."""
-        iq_modifier = ""
-        if iq < 50:
-            iq_modifier = "\n\nIMPORTANT: You are incredibly confused and barely coherent. Make mistakes. Ramble. Forget what you were saying."
-        elif iq < 80:
-            iq_modifier = "\n\nNote: You're a bit slow today. Simple words. Short sentences. Maybe misunderstand things."
-        elif iq > 150:
-            iq_modifier = "\n\nNote: You are extraordinarily intelligent. Use sophisticated vocabulary. Make unexpected connections."
-        
-        return self.system_prompt + iq_modifier
+    def __post_init__(self):
+        if self.voice:
+            self.system_prompt = f"{self.system_prompt}\n\nVoice: {self.voice}"
