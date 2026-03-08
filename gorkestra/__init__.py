@@ -1,12 +1,20 @@
 """
-gorkestra - Orchestrate Grok with personality.
+gorkestra - LLM orchestration for the unhinged.
 
-A Python SDK for xAI's Grok with configurable personas and IQ levels.
+Build autonomous AI agents powered by Grok.
 """
 
-from .core import Conductor
-from .personas.base import Persona
-from .backends.grok import GrokBackend
+from .core import Conductor, Chain, Step
+from .personas import Persona, PERSONAS
+from .tools import Tool, WebSearch, CodeExecutor
+from .memory import Memory, LocalMemory
+from .agents import Agent, ResearchAgent, ContentAgent
 
 __version__ = "0.1.0"
-__all__ = ["Conductor", "Persona", "GrokBackend"]
+__all__ = [
+    "Conductor", "Chain", "Step",
+    "Persona", "PERSONAS",
+    "Tool", "WebSearch", "CodeExecutor",
+    "Memory", "LocalMemory",
+    "Agent", "ResearchAgent", "ContentAgent",
+]
