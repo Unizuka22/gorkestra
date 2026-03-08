@@ -2,97 +2,128 @@
 
 import argparse
 import sys
-from typing import Optional
+import os
 
-def create_parser() -> argparse.ArgumentParser:
+def create_parser():
     parser = argparse.ArgumentParser(
         prog="gorkestra",
-        description="Conduct your AI. It will not listen.",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  gorkestra "explain quantum physics"
-  gorkestra "write a poem" --persona roast --iq 35
-  gorkestra "hello" --backend anthropic
-        """
+        description="LLM orchestration framework powered by Grok"
     )
     
-    parser.add_argument("prompt", nargs="?", help="The prompt to send")
-    parser.add_argument("--persona", "-p", default="default",
-                       help="Persona to use (default, roast, ceo, cope, oracle)")
-    parser.add_argument("--iq", type=int, default=100,
-                       help="IQ level 35-200 (default: 100)")
-    parser.add_argument("--backend", "-b", default="openai",
-                       help="Backend to use (openai, anthropic, ollama)")
-    parser.add_argument("--model", "-m", help="Model to use")
-    parser.add_argument("--temperature", "-t", type=float,
-                       help="Override temperature")
-    parser.add_argument("--max-tokens", type=int, default=1024,
-                       help="Maximum tokens in response")
-    parser.add_argument("--list-personas", action="store_true",
-                       help="List available personas")
-    parser.add_argument("--version", "-v", action="store_true",
-                       help="Show version")
+    subparsers = parser.add_subparsers(dest="command", help="Commands")
+    
+    # Ask command
+    ask = subparsers.add_parser("ask", help="Ask a question")
+    ask.add_argument("prompt", help="Your question")
+    ask.add_argument("--persona", "-p", default="default")
+    ask.add_argument("--model", "-m", default="grok-2")
+    ask.add_argument("--file", "-f", help="Include file content")
+    
+    # Chat command
+    chat = subparsers.add_parser("chat", help="Interactive chat")
+    chat.add_argument("--persona", "-p", default="default")
+    chat.add_argument("--memory", action="store_true")
+    
+    # Chain command
+    chain = subparsers.add_parser("chain", help="Run a chain")
+    chain.add_argument("name", choices=["research", "thread"])
+    chain.add_argument("--topic", "-t", required=True)
+    
+    # Personas command
+    subparsers.add_parser("personas", help="List personas")
+    
+    # Version
+    parser.add_argument("--version", "-v", action="store_true")
     
     return parser
 
-def get_backend(name: str, model: Optional[str] = None):
-    """Get backend instance by name."""
-    if name == "openai":
-        from .backends.openai import OpenAIBackend
-        return OpenAIBackend(model=model) if model else OpenAIBackend()
-    elif name == "anthropic":
-        from .backends.anthropic import AnthropicBackend
-        return AnthropicBackend(model=model) if model else AnthropicBackend()
-    else:
-        raise ValueError(f"Unknown backend: {name}")
-
-def main(args: Optional[list] = None) -> int:
-    parser = create_parser()
-    opts = parser.parse_args(args)
+def cmd_ask(args):
+    from .core import Conductor
     
-    if opts.version:
+    conductor = Conductor(persona=args.persona, model=args.model)
+    
+    prompt = args.prompt
+    if args.file:
+        with open(args.file) as f:
+            prompt = f"{prompt}\n\nFile content:\n{f.read()}"
+    
+    print(f"\n[{args.persona}] thinking...\n")
+    response = conductor.conduct(prompt)
+    print(response)
+
+def cmd_chat(args):
+    from .core import Conductor
+    
+    conductor = Conductor(
+        persona=args.persona,
+        memory=args.memory
+    )
+    
+    print(f"\ngorkestra chat ({args.persona})")
+    print("Type 'quit' to exit\n")
+    
+    while True:
+        try:
+            user_input = input("You: ").strip()
+            if user_input.lower() in ["quit", "exit", "q"]:
+                break
+            if not user_input:
+                continue
+            
+            response = conductor.conduct(user_input)
+            print(f"\nGrok: {response}\n")
+        except KeyboardInterrupt:
+            break
+    
+    print("\nBye!")
+
+def cmd_chain(args):
+    from .core import Conductor
+    from .core.chain import ResearchChain, ThreadChain
+    
+    conductor = Conductor(persona="analyst")
+    
+    chains = {
+        "research": ResearchChain(),
+        "thread": ThreadChain()
+    }
+    
+    chain = chains[args.name]
+    print(f"\nRunning {args.name} chain on: {args.topic}\n")
+    
+    result = conductor.run_chain(chain, topic=args.topic)
+    print(result["final"])
+
+def cmd_personas(args):
+    from .personas import PERSONAS
+    
+    print("\nAvailable personas:\n")
+    for name, persona in PERSONAS.items():
+        traits = ", ".join(persona.traits) if persona.traits else ""
+        print(f"  {name:12} - {traits}")
+    print()
+
+def main(argv=None):
+    parser = create_parser()
+    args = parser.parse_args(argv)
+    
+    if args.version:
         from . import __version__
         print(f"gorkestra v{__version__}")
         return 0
     
-    if opts.list_personas:
-        from .core import Conductor
-        conductor = Conductor()
-        print("\nAvailable personas:\n")
-        for name, desc in conductor.list_personas().items():
-            print(f"  {name:12} - {desc}")
-        print()
-        return 0
-    
-    if not opts.prompt:
+    if args.command == "ask":
+        cmd_ask(args)
+    elif args.command == "chat":
+        cmd_chat(args)
+    elif args.command == "chain":
+        cmd_chain(args)
+    elif args.command == "personas":
+        cmd_personas(args)
+    else:
         parser.print_help()
-        return 1
     
-    # Conduct!
-    from .core import Conductor
-    
-    print(f"\n🎼 conducting [{opts.persona}] via {opts.backend} (IQ={opts.iq})...\n")
-    
-    try:
-        backend = get_backend(opts.backend, opts.model)
-        conductor = Conductor(backend=backend)
-        
-        response = conductor.conduct(
-            prompt=opts.prompt,
-            persona=opts.persona,
-            iq=opts.iq,
-            temperature=opts.temperature,
-            max_tokens=opts.max_tokens
-        )
-        
-        print(response)
-        print()
-        return 0
-        
-    except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
-        return 1
+    return 0
 
 if __name__ == "__main__":
     sys.exit(main())
