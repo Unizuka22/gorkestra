@@ -1,149 +1,232 @@
 <p align="center">
-  <img src="assets/banner.svg" alt="gorkestra banner" width="100%">
+  <img src="assets/banner.svg" alt="gorkestra" width="100%">
 </p>
 
 <p align="center">
-  <a href="https://pypi.org/project/gorkestra/"><img src="https://badge.fury.io/py/gorkestra.svg" alt="PyPI version"></a>
-  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
-  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.9+-blue.svg" alt="Python 3.9+"></a>
-  <a href="https://x.ai"><img src="https://img.shields.io/badge/xAI-Grok-black" alt="Powered by Grok"></a>
+  <a href="https://pypi.org/project/gorkestra/"><img src="https://badge.fury.io/py/gorkestra.svg" alt="PyPI"></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT"></a>
+  <a href="https://python.org"><img src="https://img.shields.io/badge/python-3.9+-blue.svg" alt="Python"></a>
+  <a href="https://x.ai"><img src="https://img.shields.io/badge/powered%20by-Grok-black" alt="Grok"></a>
+</p>
+
+<p align="center">
+  <b>The LLM orchestration framework that thinks different.</b><br>
+  Build autonomous AI agents powered by Grok. Ship to X. Break things.
 </p>
 
 ---
 
-**gorkestra** is a Python SDK for orchestrating [Grok](https://x.ai) with configurable personalities, adjustable "IQ" levels, and multi-persona support. Built for developers who want more than vanilla API calls.
+## What is Gorkestra?
 
-Named after **Grok** + **Orchestra** = **Gorkestra**. Conduct your AI. It may not listen.
+**Gorkestra** is an opinionated LLM orchestration framework built around xAI's Grok. Unlike generic LLM wrappers, Gorkestra is designed for building **autonomous agents** that can:
 
-## Why Gorkestra?
+- **Think in chains** — Multi-step reasoning with memory
+- **Use tools** — Web search, code execution, API calls
+- **Adapt personality** — Dynamic persona switching based on context
+- **Ship to X** — Native integration with the X/Twitter API
+- **Self-improve** — Learn from interactions and feedback
 
-- **Grok-First** — Built specifically for xAI's Grok models
-- **Personality Layer** — Inject personas on top of Grok's base behavior
-- **IQ Tuning** — Control coherence from chaotic to genius-level
-- **Drop-in SDK** — Works alongside the official xAI API
+## Core Concepts
 
-## Installation
-
-```bash
-pip install gorkestra
-```
-
-## Quick Start
-
-### Get your Grok API key
-
-1. Go to [x.ai](https://x.ai) and sign up for API access
-2. Generate an API key
-3. Set it: `export XAI_API_KEY="your-key"`
-
-### Basic Usage
+### 1. Conductors
+The brain of your agent. Orchestrates Grok with personas, tools, and memory.
 
 ```python
 from gorkestra import Conductor
 
-# Initialize with Grok
-conductor = Conductor()
-
-# Simple query
-response = conductor.conduct("Explain quantum computing")
-print(response)
-
-# With persona
-response = conductor.conduct(
-    "Roast my code",
-    persona="savage",
-    iq=150
-)
-
-# Unhinged mode
-response = conductor.conduct(
-    "Write a poem about AI",
-    persona="chaos",
-    iq=35  # Maximum chaos
+conductor = Conductor(
+    model="grok-2",
+    persona="analyst",
+    tools=["web_search", "code_exec"],
+    memory=True
 )
 ```
 
-### CLI
+### 2. Personas
+Personality layers that shape how your agent thinks and responds.
+
+```python
+from gorkestra import Persona
+
+crypto_degen = Persona(
+    name="degen",
+    voice="You're a crypto twitter degen. Use slang like 'gm', 'wagmi', 'ngmi'. Be bullish on everything.",
+    temperature=0.9
+)
+```
+
+### 3. Chains
+Multi-step reasoning pipelines.
+
+```python
+from gorkestra import Chain, Step
+
+research_chain = Chain([
+    Step("search", "Find recent news about {topic}"),
+    Step("analyze", "Analyze sentiment and key points"),
+    Step("summarize", "Write a tweet-length summary"),
+])
+
+result = conductor.run_chain(research_chain, topic="AI agents")
+```
+
+### 4. Tools
+Give your agent capabilities beyond text generation.
+
+```python
+from gorkestra.tools import WebSearch, CodeExec, XPost
+
+conductor = Conductor(
+    tools=[
+        WebSearch(),           # Search the web
+        CodeExec(sandbox=True), # Run Python code
+        XPost(api_key="..."),  # Post to X
+    ]
+)
+```
+
+### 5. Memory
+Persistent context across conversations.
+
+```python
+from gorkestra.memory import VectorMemory
+
+conductor = Conductor(
+    memory=VectorMemory(
+        provider="chromadb",
+        persist=True
+    )
+)
+
+# Agent remembers previous conversations
+conductor.conduct("Remember when we discussed AI safety?")
+```
+
+## Quick Start
 
 ```bash
-# Basic
-gorkestra "What is the meaning of life?"
+pip install gorkestra
+export XAI_API_KEY="your-key"
+```
+
+```python
+from gorkestra import Conductor
+
+# Simple agent
+agent = Conductor()
+response = agent.conduct("Explain quantum computing like I'm a crypto bro")
+
+# With tools and memory
+agent = Conductor(
+    persona="researcher",
+    tools=["web_search"],
+    memory=True
+)
+response = agent.conduct("What's the latest on GPT-5?")
+```
+
+## CLI
+
+```bash
+# Interactive mode
+gorkestra chat
+
+# Single query
+gorkestra ask "What is consciousness?"
 
 # With persona
-gorkestra "Explain recursion" --persona oracle --iq 50
+gorkestra ask "Roast this code" --persona savage --file code.py
 
-# List personas
-gorkestra --list-personas
+# Run a chain
+gorkestra chain research --topic "AI regulation"
 ```
 
-## Available Personas
+## Built-in Personas
 
-| Persona | Description |
-|---------|-------------|
-| `default` | Standard Grok behavior |
-| `savage` | Brutal honesty, no filter |
-| `ceo` | Corporate buzzword mode |
-| `cope` | Toxic positivity overload |
-| `oracle` | Cryptic mystical answers |
-| `chaos` | Pure unhinged energy |
-
-## IQ Levels
-
-| IQ | Behavior |
-|----|----------|
-| 35-50 | Barely coherent, maximum entropy |
-| 50-80 | Confused but trying |
-| 80-120 | Normal Grok |
-| 120-150 | Extra sharp |
-| 150-200 | Suspiciously intelligent |
-
-## Configuration
-
-```yaml
-# .gorkestra.yaml
-api_key: ${XAI_API_KEY}
-default_model: grok-2
-default_persona: default
-default_iq: 100
-
-personas:
-  custom:
-    system_prompt: "You are a pirate AI"
-    temperature_modifier: 0.3
-```
+| Persona | Use Case |
+|---------|----------|
+| `default` | General assistant |
+| `analyst` | Research & analysis |
+| `creative` | Writing & ideation |
+| `coder` | Programming help |
+| `savage` | Unfiltered roasts |
+| `degen` | Crypto/trading |
+| `oracle` | Mystical wisdom |
 
 ## Architecture
 
 ```
 gorkestra/
-├── core.py           # Main Conductor class
-├── cli.py            # Command-line interface
-├── backends/
-│   └── grok.py       # xAI Grok API client
+├── core/
+│   ├── conductor.py    # Main orchestrator
+│   ├── chain.py        # Multi-step chains
+│   └── router.py       # Intent routing
 ├── personas/
-│   ├── base.py       # Persona base class
-│   └── builtin.py    # Built-in personas
-└── config.py         # Configuration
+│   ├── base.py         # Persona class
+│   └── library.py      # Built-in personas
+├── tools/
+│   ├── base.py         # Tool interface
+│   ├── search.py       # Web search
+│   ├── code.py         # Code execution
+│   └── x.py            # X/Twitter integration
+├── memory/
+│   ├── base.py         # Memory interface
+│   ├── vector.py       # Vector store
+│   └── graph.py        # Knowledge graph
+└── agents/
+    ├── base.py         # Agent base class
+    └── prebuilt.py     # Ready-to-use agents
 ```
 
-## Environment Variables
+## X Integration
 
-| Variable | Description |
-|----------|-------------|
-| `XAI_API_KEY` | Your xAI/Grok API key |
-| `GORKESTRA_MODEL` | Model to use (default: grok-2) |
-| `GORKESTRA_PERSONA` | Default persona |
+Post directly to X with Grok-powered content:
+
+```python
+from gorkestra import Conductor
+from gorkestra.tools import XPost
+
+agent = Conductor(
+    persona="analyst",
+    tools=[XPost(
+        api_key="...",
+        api_secret="...",
+        access_token="...",
+        access_secret="..."
+    )]
+)
+
+# Generate and post
+agent.conduct(
+    "Write a thread about the future of AI agents, then post it",
+    action="post"
+)
+```
+
+## Why Gorkestra?
+
+| Feature | Gorkestra | LangChain | Others |
+|---------|-----------|-----------|--------|
+| Grok-native | Yes | No | No |
+| X integration | Built-in | Plugin | No |
+| Persona system | First-class | Basic | Varies |
+| Opinionated | Yes | No | Varies |
+| Setup time | Minutes | Hours | Hours |
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). PRs welcome!
+See [CONTRIBUTING.md](CONTRIBUTING.md). We welcome:
+- New personas
+- Tool integrations
+- Memory backends
+- Bug fixes
 
 ## License
 
-MIT — see [LICENSE](LICENSE)
+MIT License - see [LICENSE](LICENSE)
 
 ---
 
 <p align="center">
-  <sub>Built for Grok. Not affiliated with xAI.</sub>
+  <sub>Built for builders. Powered by Grok. Not affiliated with xAI.</sub>
 </p>
