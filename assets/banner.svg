@@ -6,24 +6,29 @@
       <stop offset="100%" style="stop-color:#00f5d4;stop-opacity:1" />
     </linearGradient>
   </defs>
+  <!-- X logo style lines -->
+  <g opacity="0.2">
+    <line x1="50" y1="40" x2="150" y2="160" stroke="#ffffff" stroke-width="2"/>
+    <line x1="150" y1="40" x2="50" y2="160" stroke="#ffffff" stroke-width="2"/>
+  </g>
   <!-- Staff lines -->
   <g opacity="0.3">
-    <line x1="50" y1="60" x2="750" y2="60" stroke="#ff2d78" stroke-width="1"/>
-    <line x1="50" y1="75" x2="750" y2="75" stroke="#ff2d78" stroke-width="1"/>
-    <line x1="50" y1="90" x2="750" y2="90" stroke="#ff2d78" stroke-width="1"/>
-    <line x1="50" y1="105" x2="750" y2="105" stroke="#ff2d78" stroke-width="1"/>
-    <line x1="50" y1="120" x2="750" y2="120" stroke="#ff2d78" stroke-width="1"/>
+    <line x1="180" y1="60" x2="750" y2="60" stroke="#ff2d78" stroke-width="1"/>
+    <line x1="180" y1="75" x2="750" y2="75" stroke="#ff2d78" stroke-width="1"/>
+    <line x1="180" y1="90" x2="750" y2="90" stroke="#ff2d78" stroke-width="1"/>
+    <line x1="180" y1="105" x2="750" y2="105" stroke="#ff2d78" stroke-width="1"/>
+    <line x1="180" y1="120" x2="750" y2="120" stroke="#ff2d78" stroke-width="1"/>
   </g>
   <!-- Notes -->
-  <text x="100" y="95" font-size="32" fill="#00f5d4" opacity="0.6">♩</text>
-  <text x="160" y="80" font-size="32" fill="#ff2d78">♪</text>
-  <text x="620" y="100" font-size="32" fill="#00f5d4" opacity="0.6">♫</text>
-  <text x="700" y="75" font-size="32" fill="#ff2d78">♬</text>
+  <text x="200" y="95" font-size="28" fill="#00f5d4" opacity="0.6">♩</text>
+  <text x="260" y="80" font-size="28" fill="#ff2d78">♪</text>
+  <text x="650" y="100" font-size="28" fill="#00f5d4" opacity="0.6">♫</text>
+  <text x="710" y="75" font-size="28" fill="#ff2d78">♬</text>
   <!-- Title -->
-  <text x="400" y="105" font-family="monospace" font-size="56" font-weight="bold" fill="white" text-anchor="middle">gorkestra</text>
+  <text x="450" y="105" font-family="monospace" font-size="56" font-weight="bold" fill="white" text-anchor="middle">gorkestra</text>
   <!-- Tagline -->
-  <text x="400" y="145" font-family="monospace" font-size="14" fill="#ff2d78" text-anchor="middle" letter-spacing="3">CONDUCT YOUR AI. IT WILL NOT LISTEN.</text>
+  <text x="450" y="145" font-family="monospace" font-size="14" fill="#ff2d78" text-anchor="middle" letter-spacing="2">ORCHESTRATE GROK. UNLEASH CHAOS.</text>
   <!-- Version badge -->
-  <rect x="340" y="160" width="120" height="24" rx="12" fill="#ff2d78" fill-opacity="0.15" stroke="#ff2d78" stroke-opacity="0.5"/>
-  <text x="400" y="177" font-family="monospace" font-size="11" fill="#ff2d78" text-anchor="middle">v0.1.0 · MIT</text>
+  <rect x="365" y="160" width="170" height="24" rx="12" fill="#ff2d78" fill-opacity="0.15" stroke="#ff2d78" stroke-opacity="0.5"/>
+  <text x="450" y="177" font-family="monospace" font-size="11" fill="#ff2d78" text-anchor="middle">powered by xAI Grok</text>
 </svg>

@@ -6,22 +6,21 @@
   <a href="https://pypi.org/project/gorkestra/"><img src="https://badge.fury.io/py/gorkestra.svg" alt="PyPI version"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.9+-blue.svg" alt="Python 3.9+"></a>
-  <a href="https://github.com/Unizuka22/gorkestra"><img src="https://img.shields.io/badge/chaos-high-ff69b4" alt="Chaos Level: High"></a>
+  <a href="https://x.ai"><img src="https://img.shields.io/badge/xAI-Grok-black" alt="Powered by Grok"></a>
 </p>
 
 ---
 
-**gorkestra** is an LLM orchestration layer that wraps any AI backend with a configurable personality — from slightly unhinged to completely deranged.
+**gorkestra** is a Python SDK for orchestrating [Grok](https://x.ai) with configurable personalities, adjustable "IQ" levels, and multi-persona support. Built for developers who want more than vanilla API calls.
 
-It works like LangChain. It does not behave like LangChain.
+Named after **Grok** + **Orchestra** = **Gorkestra**. Conduct your AI. It may not listen.
 
-## Features
+## Why Gorkestra?
 
-- **Multiple Personas** — Switch between personalities on the fly
-- **Adjustable IQ** — Control the chaos level (35 = very dumb, 200 = suspiciously coherent)
-- **Multi-Backend** — Works with OpenAI, Anthropic Claude, and local Ollama models
-- **CLI & Python API** — Use from terminal or import in your code
-- **Extensible** — Create your own personas with custom system prompts
+- **Grok-First** — Built specifically for xAI's Grok models
+- **Personality Layer** — Inject personas on top of Grok's base behavior
+- **IQ Tuning** — Control coherence from chaotic to genius-level
+- **Drop-in SDK** — Works alongside the official xAI API
 
 ## Installation
 
@@ -29,174 +28,122 @@ It works like LangChain. It does not behave like LangChain.
 pip install gorkestra
 ```
 
-### Optional backends
+## Quick Start
 
-```bash
-pip install gorkestra[anthropic]   # Claude support
-pip install gorkestra[ollama]      # Local models
-pip install gorkestra[all]         # Everything
-```
+### Get your Grok API key
 
-## Quickstart
+1. Go to [x.ai](https://x.ai) and sign up for API access
+2. Generate an API key
+3. Set it: `export XAI_API_KEY="your-key"`
 
-### CLI Usage
-
-```bash
-# Basic usage
-gorkestra "explain quantum physics"
-
-# With persona
-gorkestra "explain recursion" --persona oracle
-
-# Adjust the IQ
-gorkestra "write a poem" --persona roast --iq 35
-
-# Use different backend
-gorkestra "hello" --backend anthropic --model claude-3-opus
-```
-
-### Python API
+### Basic Usage
 
 ```python
 from gorkestra import Conductor
 
-# Initialize with default settings
+# Initialize with Grok
 conductor = Conductor()
 
 # Simple query
-response = conductor.conduct("Explain machine learning")
+response = conductor.conduct("Explain quantum computing")
 print(response)
 
-# With persona and IQ adjustment
+# With persona
 response = conductor.conduct(
-    "Write a startup pitch",
-    persona="ceo",
+    "Roast my code",
+    persona="savage",
     iq=150
 )
 
-# Using a different backend
-from gorkestra import Conductor, AnthropicBackend
+# Unhinged mode
+response = conductor.conduct(
+    "Write a poem about AI",
+    persona="chaos",
+    iq=35  # Maximum chaos
+)
+```
 
-conductor = Conductor(backend=AnthropicBackend())
-response = conductor.conduct("Hello", persona="oracle")
+### CLI
+
+```bash
+# Basic
+gorkestra "What is the meaning of life?"
+
+# With persona
+gorkestra "Explain recursion" --persona oracle --iq 50
+
+# List personas
+gorkestra --list-personas
 ```
 
 ## Available Personas
 
-| Persona | Description | Example Output |
-|---------|-------------|----------------|
-| `default` | Standard helpful assistant | Normal AI responses |
-| `roast` | Savage, brutal honesty | "Your code is bad and you should feel bad" |
-| `ceo` | Corporate buzzword generator | "Let's leverage synergies to disrupt the paradigm" |
-| `cope` | Toxic positivity overload | "Everything is AMAZING and will be FINE" |
-| `oracle` | Cryptic, mystical responses | "The answer lies within... or does it?" |
+| Persona | Description |
+|---------|-------------|
+| `default` | Standard Grok behavior |
+| `savage` | Brutal honesty, no filter |
+| `ceo` | Corporate buzzword mode |
+| `cope` | Toxic positivity overload |
+| `oracle` | Cryptic mystical answers |
+| `chaos` | Pure unhinged energy |
 
 ## IQ Levels
 
-The `--iq` parameter controls response coherence:
-
-| IQ Range | Behavior |
-|----------|----------|
-| 35-50 | Barely coherent, maximum chaos |
+| IQ | Behavior |
+|----|----------|
+| 35-50 | Barely coherent, maximum entropy |
 | 50-80 | Confused but trying |
-| 80-120 | Normal operation |
-| 120-150 | Surprisingly insightful |
+| 80-120 | Normal Grok |
+| 120-150 | Extra sharp |
 | 150-200 | Suspiciously intelligent |
 
 ## Configuration
 
-Create a `.gorkestra.yaml` in your project or home directory:
-
 ```yaml
-default_backend: openai
+# .gorkestra.yaml
+api_key: ${XAI_API_KEY}
+default_model: grok-2
 default_persona: default
 default_iq: 100
 
-backends:
-  openai:
-    model: gpt-4
-    api_key: ${OPENAI_API_KEY}
-  
-  anthropic:
-    model: claude-3-sonnet
-    api_key: ${ANTHROPIC_API_KEY}
-  
-  ollama:
-    model: llama2
-    host: http://localhost:11434
-
 personas:
-  custom_persona:
-    system_prompt: "You are a helpful assistant who speaks like a pirate"
-    temperature_modifier: 0.2
-```
-
-## Creating Custom Personas
-
-```python
-from gorkestra import Conductor, Persona
-
-# Define a custom persona
-pirate = Persona(
-    name="pirate",
-    system_prompt="You are a helpful assistant who speaks like a pirate. Use 'arr', 'matey', and nautical terms.",
-    temperature_modifier=0.3
-)
-
-# Register and use
-conductor = Conductor()
-conductor.register_persona(pirate)
-
-response = conductor.conduct("How do I install Python?", persona="pirate")
-# "Arr matey! To install Python on yer ship..."
+  custom:
+    system_prompt: "You are a pirate AI"
+    temperature_modifier: 0.3
 ```
 
 ## Architecture
 
 ```
 gorkestra/
-├── core.py          # Main Conductor class
-├── cli.py           # Command-line interface
+├── core.py           # Main Conductor class
+├── cli.py            # Command-line interface
 ├── backends/
-│   ├── base.py      # Abstract backend class
-│   ├── openai.py    # OpenAI implementation
-│   ├── anthropic.py # Anthropic implementation
-│   └── ollama.py    # Ollama implementation
+│   └── grok.py       # xAI Grok API client
 ├── personas/
-│   ├── base.py      # Persona base class
-│   └── builtin.py   # Built-in personas
-└── config.py        # Configuration handling
+│   ├── base.py       # Persona base class
+│   └── builtin.py    # Built-in personas
+└── config.py         # Configuration
 ```
 
 ## Environment Variables
 
 | Variable | Description |
 |----------|-------------|
-| `OPENAI_API_KEY` | OpenAI API key |
-| `ANTHROPIC_API_KEY` | Anthropic API key |
-| `GORKESTRA_DEFAULT_BACKEND` | Default backend to use |
-| `GORKESTRA_DEFAULT_PERSONA` | Default persona |
-| `GORKESTRA_CONFIG` | Path to config file |
+| `XAI_API_KEY` | Your xAI/Grok API key |
+| `GORKESTRA_MODEL` | Model to use (default: grok-2) |
+| `GORKESTRA_PERSONA` | Default persona |
 
 ## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-## Hall of Fame
-
-See [HALL_OF_FAME.md](HALL_OF_FAME.md) for our amazing contributors.
+See [CONTRIBUTING.md](CONTRIBUTING.md). PRs welcome!
 
 ## License
 
-MIT License — see [LICENSE](LICENSE) for details.
+MIT — see [LICENSE](LICENSE)
 
 ---
 
 <p align="center">
-  <i>"The AI will not listen. That's a feature, not a bug."</i>
+  <sub>Built for Grok. Not affiliated with xAI.</sub>
 </p>
