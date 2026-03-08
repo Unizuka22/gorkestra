@@ -5,14 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "gorkestra"
 version = "0.1.0"
-description = "Orchestrate Grok with personality. A Python SDK for xAI's Grok."
+description = "LLM orchestration framework powered by Grok. Build autonomous AI agents."
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.9"
-authors = [
-    {name = "Unizuka22"}
-]
-keywords = ["grok", "xai", "ai", "llm", "orchestration", "sdk"]
+authors = [{name = "Unizuka22"}]
+keywords = ["llm", "grok", "ai", "agents", "orchestration", "xai", "twitter", "x"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -22,13 +20,16 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
-dependencies = [
-    "openai>=1.0.0",
-]
+dependencies = ["openai>=1.0.0"]
 
 [project.optional-dependencies]
-dev = ["pytest>=7.0", "pytest-cov", "black", "ruff", "mypy"]
+search = ["duckduckgo-search>=3.0"]
+x = ["tweepy>=4.0"]
+memory = ["chromadb>=0.3"]
+all = ["duckduckgo-search>=3.0", "tweepy>=4.0", "chromadb>=0.3"]
+dev = ["pytest", "black", "ruff", "mypy"]
 
 [project.scripts]
 gorkestra = "gorkestra.cli:main"
@@ -36,6 +37,3 @@ gorkestra = "gorkestra.cli:main"
 [project.urls]
 Homepage = "https://github.com/Unizuka22/gorkestra"
 Repository = "https://github.com/Unizuka22/gorkestra"
-
-[tool.setuptools.packages.find]
-include = ["gorkestra*"]
